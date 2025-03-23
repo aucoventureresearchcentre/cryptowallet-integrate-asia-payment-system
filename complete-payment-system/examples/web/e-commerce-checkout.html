@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Store with Asian Crypto Payment Integration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .product-card {
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .payment-options {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        #payment-qr-container {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+        .country-flag {
+            width: 24px;
+            height: 16px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">AsianTech Store</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <select id="country-selector" class="form-select me-2">
+                        <option value="MY">🇲🇾 Malaysia</option>
+                        <option value="SG">🇸🇬 Singapore</option>
+                        <option value="ID">🇮🇩 Indonesia</option>
+                        <option value="TH">🇹🇭 Thailand</option>
+                        <option value="BN">🇧🇳 Brunei</option>
+                        <option value="KH">🇰🇭 Cambodia</option>
+                        <option value="VN">🇻🇳 Vietnam</option>
+                        <option value="LA">🇱🇦 Laos</option>
+                    </select>
+                    <button class="btn btn-outline-light">
+                        <i class="bi bi-cart"></i> Cart (3)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h2>Checkout</h2>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        Order Summary
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <h6>Smartphone X Pro</h6>
+                                <small class="text-muted">High-end smartphone with 256GB storage</small>
+                            </div>
+                            <span>$899.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <h6>Wireless Earbuds</h6>
+                                <small class="text-muted">Noise-cancelling wireless earbuds</small>
+                            </div>
+                            <span>$129.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <h6>Smart Watch Series 5</h6>
+                                <small class="text-muted">Fitness and health tracking smartwatch</small>
+                            </div>
+                            <span>$299.00</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <h5>Total</h5>
+                            <h5 id="total-amount">$1,327.00</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h2>Payment</h2>
+                <div class="payment-options">
+                    <h5>Select Payment Method</h5>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" checked>
+                        <label class="form-check-label" for="creditCard">
+                            Credit Card
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer">
+                        <label class="form-check-label" for="bankTransfer">
+                            Bank Transfer
+                        </label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="cryptoPayment">
+                        <label class="form-check-label" for="cryptoPayment">
+                            Cryptocurrency
+                        </label>
+                    </div>
+                    
+                    <div id="crypto-options" style="display: none;">
+                        <h6>Select Cryptocurrency</h6>
+                        <select id="crypto-selector" class="form-select mb-3">
+                            <option value="BTC">Bitcoin (BTC)</option>
+                            <option value="ETH">Ethereum (ETH)</option>
+                            <option value="USDT">Tether (USDT)</option>
+                        </select>
+                    </div>
+                    
+                    <button id="pay-button" class="btn btn-primary w-100">Pay Now</button>
+                </div>
+                
+                <div id="payment-qr-container">
+                    <h5>Scan QR Code to Pay</h5>
+                    <div id="payment-qr-code"></div>
+                    <div id="payment-details" class="mt-3">
+                        <p id="crypto-amount">Amount: 0.0 BTC</p>
+                        <p id="payment-address">Address: Loading...</p>
+                        <p id="payment-expiry">Expires: -</p>
+                    </div>
+                    <div id="payment-status" class="alert alert-info mt-3">
+                        Waiting for payment...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>AsianTech Store</h5>
+                    <p>Your trusted source for electronics across Asia.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Home</a></li>
+                        <li><a href="#" class="text-white">Products</a></li>
+                        <li><a href="#" class="text-white">About</a></li>
+                        <li><a href="#" class="text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact</h5>
+                    <address>
+                        123 Tech Street<br>
+                        Singapore 123456<br>
+                        <a href="mailto:info@asiantech.com" class="text-white">info@asiantech.com</a>
+                    </address>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p>&copy; 2025 AsianTech Store. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../../sdk/web/asian-crypto-payment.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize variables
+            let selectedCountry = document.getElementById('country-selector').value;
+            let selectedCrypto = document.getElementById('crypto-selector').value;
+            
+            // Get currency based on country
+            const countryCurrencyMap = {
+                'MY': 'MYR',
+                'SG': 'SGD',
+                'ID': 'IDR',
+                'TH': 'THB',
+                'BN': 'BND',
+                'KH': 'KHR',
+                'VN': 'VND',
+                'LA': 'LAK'
+            };
+            
+            // Initialize the payment SDK
+            let asianCryptoPayment = new AsianCryptoPayment({
+                apiKey: 'demo_api_key',
+                merchantId: 'demo_merchant_id',
+                countryCode: selectedCountry,
+                testMode: true
+            });
+            
+            // Update SDK when country changes
+            document.getElementById('country-selector').addEventListener('change', function() {
+                selectedCountry = this.value;
+                
+                // Reinitialize the payment SDK with new country
+                asianCryptoPayment = new AsianCryptoPayment({
+                    apiKey: 'demo_api_key',
+                    merchantId: 'demo_merchant_id',
+                    countryCode: selectedCountry,
+                    testMode: true
+                });
+                
+                // Update currency display
+                updateCurrencyDisplay();
+            });
+            
+            // Show/hide crypto options based on payment method selection
+            document.querySelectorAll('input[name="paymentMethod"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    document.getElementById('crypto-options').style.display = 
+                        document.getElementById('cryptoPayment').checked ? 'block' : 'none';
+                });
+            });
+            
+            // Update selected cryptocurrency
+            document.getElementById('crypto-selector').addEventListener('change', function() {
+                selectedCrypto = this.value;
+            });
+            
+            // Handle pay button click
+            document.getElementById('pay-button').addEventListener('click', function() {
+                if (document.getElementById('cryptoPayment').checked) {
+                    processPayment();
+                } else {
+                    alert('This example only demonstrates cryptocurrency payments. Please select the Cryptocurrency payment method.');
+                }
+            });
+            
+            // Process payment function
+            function processPayment() {
+                // Get total amount
+                const totalText = document.getElementById('total-amount').innerText;
+                const totalAmount = parseFloat(totalText.replace('$', '').replace(',', ''));
+                
+                // Show payment QR container
+                document.getElementById('payment-qr-container').style.display = 'block';
+                
+                // Create payment
+                asianCryptoPayment.createPayment({
+                    amount: totalAmount,
+                    currency: 'USD', // Using USD for demo, would use local currency in production
+                    cryptoCurrency: selectedCrypto,
+                    description: 'Purchase from AsianTech Store',
+                    metadata: {
+                        orderId: 'ORD-' + Math.floor(Math.random() * 1000000),
+                        customerCountry: selectedCountry
+                    }
+                }).then(payment => {
+                    console.log('Payment created:', payment);
+                    
+                    // Update QR code
+                    document.getElementById('payment-qr-code').innerHTML = 
+                        `<img src="https://chart.googleapis.com/chart?cht=qr&chs=250x250&chl=${encodeURIComponent(payment.payment_address)}" alt="Payment QR Code">`;
+                    
+                    // Update payment details
+                    document.getElementById('crypto-amount').innerText = 
+                        `Amount: ${payment.crypto_amount} ${payment.crypto_currency}`;
+                    document.getElementById('payment-address').innerText = 
+                        `Address: ${payment.payment_address}`;
+                    document.getElementById('payment-expiry').innerText = 
+                        `Expires: ${new Date(payment.expires_at).toLocaleString()}`;
+                    
+                    // Start checking payment status
+                    checkPaymentStatus(payment.transaction_id);
+                    
+                }).catch(error => {
+                    console.error('Payment creation failed:', error);
+                    document.getElementById('payment-status').className = 'alert alert-danger mt-3';
+                    document.getElementById('payment-status').innerText = 'Payment creation failed: ' + error.message;
+                });
+            }
+            
+            // Check payment status function
+            function checkPaymentStatus(transactionId) {
+                const statusElement = document.getElementById('payment-status');
+                
+                // This would be a real API call in production
+                // For demo, we'll simulate a successful payment after 5 seconds
+                setTimeout(() => {
+                    statusElement.className = 'alert alert-success mt-3';
+                    statusElement.innerText = 'Payment completed successfully!';
+                    
+                    // Add order confirmation message
+                    const confirmationElement = document.createElement('div');
+                    confirmationElement.className = 'alert alert-primary mt-3';
+                    confirmationElement.innerHTML = `
+                        <h5>Order Confirmed!</h5>
+                        <p>Your order has been confirmed and will be processed shortly.</p>
+                        <p>Order ID: ORD-${Math.floor(Math.random() * 1000000)}</p>
+                        <p>Thank you for shopping with AsianTech Store!</p>
+                    `;
+                    document.getElementById('payment-qr-container').appendChild(confirmationElement);
+                    
+                }, 5000);
+            }
+            
+            // Update currency display based on selected country
+            function updateCurrencyDisplay() {
+                const currency = countryCurrencyMap[selectedCountry];
+                // In a real implementation, we would convert the amount to the local currency
+                // For this demo, we'll just update the currency symbol
+                document.getElementById('total-amount').innerText = `$1,327.00 (≈ ${currency})`;
+            }
+            
+            // Initial currency display update
+            updateCurrencyDisplay();
+        });
+    </script>
+</body>
+</html>
